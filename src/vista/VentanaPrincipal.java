@@ -20,7 +20,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private final JuegoDAO dao = new JuegoDAO();
 private JuegosTableModel modeloTabla;
 public VentanaPrincipal() {
-initComponents(); // generado por NetBeans — no borrar
+initComponents();
+setJMenuBar(jMenuBar1);
 configurarTabla(); // conecta el modelo y el renderer
 configurarPopup(); // asocia el popup a la tabla
 cargarDatos(); // carga los juegos de la BD
@@ -43,12 +44,13 @@ tablaJuegos.getColumnModel().getColumn(3).setPreferredWidth(100);
 tablaJuegos.getColumnModel().getColumn(4).setPreferredWidth(50);
 tablaJuegos.getColumnModel().getColumn(5).setPreferredWidth(110);
 tablaJuegos.getColumnModel().getColumn(6).setPreferredWidth(100);
+
 // Doble clic en una fila abre el diálogo de edición
 tablaJuegos.addMouseListener(new java.awt.event.MouseAdapter() {
-@Override
-public void mouseClicked(java.awt.event.MouseEvent e) {
-if (e.getClickCount() == 2) editarSeleccionado();
-}
+    @Override
+    public void mouseClicked(java.awt.event.MouseEvent e) {
+        if (e.getClickCount() == 2) editarSeleccionado();
+    }
 });
 }
 private void configurarPopup() {
@@ -78,12 +80,17 @@ lblCompletados.setText(" | Completados: " + comp);
 lblMedia.setText (" | Media: " + (total == 0 ? "–" : String.format("%.1f ★", med)));
 }
 private void editarSeleccionado() {
-int fila = tablaJuegos.getSelectedRow();
-if (fila < 0) return;
-Juego j = modeloTabla.getJuego(fila);
-DialogoJuego dlg = new DialogoJuego(this, j);
-dlg.setVisible(true);
-if (dlg.isGuardado()) { dao.actualizar(dlg.getJuego()); cargarDatos(); }
+    int fila = tablaJuegos.getSelectedRow();
+    if (fila < 0) return;
+
+    Juego j = modeloTabla.getJuego(fila);
+    DialogoJuego dlg = new DialogoJuego(this, j);
+    dlg.setVisible(true);
+
+    if (dlg.isGuardado()) {
+        dao.actualizar(dlg.getJuego());
+        cargarDatos();
+    }
 }
 private void eliminarSeleccionado() {
 int fila = tablaJuegos.getSelectedRow();
@@ -177,11 +184,14 @@ dao.eliminar(j.getId()); cargarDatos();
         popAnyadir.addActionListener(this::popAnyadirActionPerformed);
         popupTabla.add(popAnyadir);
 
+        popEditar.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         popEditar.setText("Editar juego...");
+        popEditar.addActionListener(this::popEditarActionPerformed);
         popupTabla.add(popEditar);
         popupTabla.add(jSeparator2);
 
         popEliminar.setText("Eliminar juego");
+        popEliminar.addActionListener(this::popEliminarActionPerformed);
         popupTabla.add(popEliminar);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -262,11 +272,21 @@ dao.eliminar(j.getId()); cargarDatos();
     }//GEN-LAST:event_mniActualizarActionPerformed
 
     private void popAnyadirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popAnyadirActionPerformed
-        // TODO add your handling code here:
+        DialogoJuego dlg = new DialogoJuego(this, null);
+    dlg.setVisible(true);
+    if (dlg.isGuardado()) {
+        dao.insertar(dlg.getJuego());
+        cargarDatos();
+    }
     }//GEN-LAST:event_popAnyadirActionPerformed
 
     private void btnAnyadirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnyadirActionPerformed
-        
+        DialogoJuego dlg = new DialogoJuego(this, null);
+    dlg.setVisible(true);
+    if (dlg.isGuardado()) {
+        dao.insertar(dlg.getJuego());
+        cargarDatos();
+    }
     }//GEN-LAST:event_btnAnyadirActionPerformed
 
     private void mniEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniEditarActionPerformed
@@ -300,6 +320,14 @@ modeloTabla.setJuegos(lista);
     private void mniSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniSalirActionPerformed
         System.exit(0);
     }//GEN-LAST:event_mniSalirActionPerformed
+
+    private void popEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popEditarActionPerformed
+        editarSeleccionado();
+    }//GEN-LAST:event_popEditarActionPerformed
+
+    private void popEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popEliminarActionPerformed
+        eliminarSeleccionado();
+    }//GEN-LAST:event_popEliminarActionPerformed
 
     /**
      * @param args the command line arguments
